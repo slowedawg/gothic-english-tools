@@ -328,7 +328,7 @@ export default function RavenTool({ onBack }) {
       const newTF=new Set([...targetsFound,hit.id])
       const pts=hit.pts+(apFx.length>20?120:apFx.length>8?60:0)
       setAnnotations(newAnns); setTargetsFound(newTF); addScore(pts)
-      setApFb({type:'ok',msg:`✓ Target found: ${hit.label} (+${pts} pts) — ${hit.explanation}${apFx?` Your effect: "${apFx}"`.' Add an effect next time for bonus points.'}`})
+      setApFb({type:'ok',msg:`✓ Target found: ${hit.label} (+${pts} pts) — ${hit.explanation}` + (apFx ? ` Your effect: "${apFx}"` : ' Add an effect next time for bonus points.')})
       setTimeout(()=>{
         closePanel()
         if(newTF.size===TARGETS.length){saveStudentData(playerName,score+pts,newTF,newAnns);setTimeout(()=>setScreen('complete'),700)}
