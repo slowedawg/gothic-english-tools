@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Blackwood Manor</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--void:#05050a;--deep:#0d0d1a;--blood:#8b0000;--crimson:#c0392b;--gold:#c9a84c;--pale:#e8d5a3;--bone:#f0e6d3;--ghost:#c8bfb0;--mist:#8a8070;--green:#27ae60;--greenl:#a8f0c0}
+html,body{min-height:100vh;background:var(--void);font-family:'Crimson Text',serif;color:var(--bone);overflow-x:hidden}
+.bg{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(139,0,0,.07),transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(139,0,0,.04),transparent 40%);pointer-events:none;z-index:0}
+.grid{position:fixed;inset:0;background-image:linear-gradient(rgba(201,168,76,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+
+/* ── SCREENS ── */
+.screen{position:relative;z-index:1;min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px}
+.screen.on{display:flex}
+
+/* ── BUTTONS ── */
+.btn{font-family:'Cinzel',serif;font-weight:700;letter-spacing:3px;text-transform:uppercase;border:none;cursor:pointer;transition:all .25s}
+.btn-g{font-size:13px;color:var(--void);background:linear-gradient(135deg,var(--gold),var(--pale),var(--gold));padding:15px 42px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.btn-g:hover{background:linear-gradient(135deg,var(--pale),#fffae0,var(--pale));transform:scale(1.04);box-shadow:0 0 28px rgba(201,168,76,.5)}
+.btn-g:disabled{opacity:.4;cursor:default;transform:none}
+.btn-o{font-size:12px;color:var(--bone);background:transparent;border:1px solid var(--blood);padding:12px 28px;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+.btn-o:hover{background:var(--blood);box-shadow:0 0 18px rgba(139,0,0,.5)}
+.btn-sm{font-size:11px;padding:10px 20px}
+
+/* ── SHARED ── */
+.divider{width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:16px auto}
+.card{background:linear-gradient(135deg,rgba(20,20,32,.97),rgba(13,13,26,.97));border:1px solid rgba(201,168,76,.2);padding:36px 44px;max-width:540px;width:100%;position:relative}
+.card::before,.card::after{content:'✦';position:absolute;color:var(--gold);font-size:16px;opacity:.5}
+.card::before{top:10px;left:14px}.card::after{bottom:10px;right:14px}
+.card-title{font-family:'Cinzel',serif;font-size:20px;color:var(--gold);text-align:center;margin-bottom:6px;letter-spacing:2px}
+.card-sub{font-style:italic;color:var(--ghost);text-align:center;font-size:16px;line-height:1.6;margin-bottom:24px}
+.tag{font-family:'Cinzel',serif;font-size:11px;letter-spacing:5px;text-transform:uppercase;opacity:.6;margin-bottom:12px;text-align:center}
+
+/* ── TITLE ── */
+.t-h1{font-family:'Cinzel Decorative',serif;font-size:clamp(26px,5.5vw,54px);font-weight:900;text-align:center;line-height:1.1;text-shadow:0 0 40px rgba(192,57,43,.5),0 0 80px rgba(192,57,43,.2);margin-bottom:8px}
+.t-h2{font-family:'Cinzel Decorative',serif;font-size:clamp(13px,2.5vw,21px);color:var(--crimson);text-align:center;margin-bottom:24px;text-shadow:0 0 20px rgba(192,57,43,.6)}
+.t-flavor{font-style:italic;color:var(--ghost);font-size:17px;text-align:center;max-width:440px;line-height:1.7;margin-bottom:32px}
+.candles{display:flex;gap:52px;margin-bottom:28px;align-items:flex-end}
+.candle{display:flex;flex-direction:column;align-items:center}
+.flame{width:12px;height:22px;background:radial-gradient(ellipse at bottom,#fff7a0,#f5a623,#c0392b,transparent);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;animation:flkr 2s ease-in-out infinite alternate;filter:blur(.5px);box-shadow:0 0 8px rgba(245,166,35,.8),0 0 18px rgba(192,57,43,.4)}
+.cbody{width:16px;background:linear-gradient(180deg,#e8ddd0,#c4b9aa,#a89e90);border-radius:2px 2px 0 0;box-shadow:inset -3px 0 6px rgba(0,0,0,.3)}
+.cdrip{width:20px;height:8px;background:#c4b9aa;border-radius:0 0 50% 50%}
+@keyframes flkr{0%{transform:scaleX(1) rotate(-1deg);opacity:1}25%{transform:scaleX(.8) rotate(1deg) scaleY(1.1);opacity:.9}75%{transform:scaleX(.9) rotate(2deg) scaleY(.95);opacity:.85}100%{transform:scaleX(1) rotate(-1deg);opacity:1}}
+
+/* ── NAME ── */
+.ninput{width:100%;background:rgba(5,5,10,.8);border:none;border-bottom:2px solid var(--gold);color:var(--bone);font-family:'Cinzel',serif;font-size:18px;padding:14px 16px;text-align:center;letter-spacing:2px;outline:none;transition:box-shadow .3s;margin-bottom:24px}
+.ninput:focus{box-shadow:0 4px 20px rgba(201,168,76,.2)}
+.ninput::placeholder{color:var(--mist);font-style:italic}
+
+/* ── ROOM HEADER ── */
+.room-header{position:sticky;top:0;z-index:10;width:100%;background:rgba(5,5,10,.95);border-bottom:1px solid rgba(201,168,76,.15);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.rh-room{font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:3px}
+.rh-name{font-family:'Cinzel Decorative',serif;font-size:14px;color:var(--bone);flex:1;text-align:center}
+.rh-right{display:flex;align-items:center;gap:16px}
+.rh-score{font-family:'Cinzel',serif;font-size:12px;color:var(--mist);letter-spacing:1px}
+.rh-score span{color:var(--gold);font-size:16px}
+.timer-w{position:relative;width:52px;height:52px;flex-shrink:0}
+.timer-svg{transform:rotate(-90deg)}
+.t-bg{fill:none;stroke:rgba(201,168,76,.1);stroke-width:3.5}
+.t-arc{fill:none;stroke-width:3.5;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .5s}
+.t-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:15px;font-weight:700}
+.dots{display:flex;gap:7px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--mist);transition:all .4s}
+.dot.done{background:var(--gold);border-color:var(--gold);box-shadow:0 0 8px rgba(201,168,76,.5)}
+.dot.active{border-color:var(--crimson);box-shadow:0 0 8px rgba(192,57,43,.5);animation:pulse .8s ease-in-out infinite alternate}
+@keyframes pulse{from{box-shadow:0 0 4px rgba(192,57,43,.4)}to{box-shadow:0 0 12px rgba(192,57,43,.8)}}
+
+/* ── ROOM CONTENT ── */
+.room-body{width:100%;max-width:820px;padding:24px 0 40px;flex:1}
+.room-story{background:rgba(139,0,0,.08);border-left:3px solid var(--blood);padding:14px 20px;margin-bottom:24px;font-style:italic;font-size:17px;line-height:1.6;color:var(--ghost)}
+.room-story strong{color:var(--bone);font-style:normal;font-family:'Cinzel',serif;font-size:13px;letter-spacing:2px;display:block;margin-bottom:6px}
+
+/* ── FEEDBACK BAR ── */
+.fb{padding:12px 18px;margin-top:12px;font-style:italic;font-size:15px;line-height:1.5;border-radius:0;animation:fdin .3s ease;min-height:44px}
+.fb.ok{background:rgba(0,80,0,.15);border-left:3px solid var(--green);color:var(--greenl)}
+.fb.bad{background:rgba(139,0,0,.15);border-left:3px solid var(--crimson);color:#f0c0b0}
+.fb.info{background:rgba(40,40,60,.4);border-left:3px solid var(--mist);color:var(--ghost)}
+@keyframes fdin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── ROOM 1: SORT ── */
+.sort-pool{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;min-height:54px}
+.sort-item{background:rgba(20,20,32,.8);border:1px solid rgba(201,168,76,.15);color:var(--ghost);font-size:15px;padding:10px 16px;cursor:pointer;transition:all .25s;line-height:1.3}
+.sort-item:hover{border-color:rgba(201,168,76,.4);color:var(--bone)}
+.sort-item.sel{border-color:var(--gold);color:var(--bone);background:rgba(201,168,76,.1);box-shadow:0 0 12px rgba(201,168,76,.3)}
+.sort-item.shake{animation:shk .5s ease}
+@keyframes shk{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:500px){.bins{grid-template-columns:1fr}}
+.bin{border:2px dashed rgba(201,168,76,.2);padding:16px;min-height:100px;cursor:pointer;transition:all .3s;background:rgba(10,10,20,.5)}
+.bin:hover{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.05)}
+.bin.target{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.bin-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;margin-bottom:10px;text-align:center}
+.bin-items{display:flex;flex-wrap:wrap;gap:6px}
+.bin-chip{background:rgba(0,80,0,.2);border:1px solid var(--green);color:var(--greenl);font-size:13px;padding:5px 10px}
+.bin-chip.ng{background:rgba(80,0,0,.2);border-color:var(--crimson);color:#f0c0b0}
+.sort-count{font-family:'Cinzel',serif;font-size:13px;color:var(--mist);letter-spacing:2px;margin-bottom:14px;text-align:center}
+
+/* ── ROOM 2: MATCH ── */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:540px){.match-grid{grid-template-columns:1fr}}
+.match-col-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--mist);margin-bottom:10px;text-align:center;text-transform:uppercase}
+.match-card{background:rgba(20,20,32,.8);border:1px solid rgba(201,168,76,.12);padding:14px 16px;cursor:pointer;transition:all .25s;font-size:15px;line-height:1.4;margin-bottom:8px;position:relative}
+.match-card:hover:not(.matched):not(.disabled){border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.05)}
+.match-card.sel{border-color:var(--gold);background:rgba(201,168,76,.1);box-shadow:0 0 12px rgba(201,168,76,.3)}
+.match-card.matched{border-color:var(--green);background:rgba(0,80,0,.15);color:var(--greenl);cursor:default}
+.match-card.wrong{animation:shk .45s ease}
+.match-card.disabled{opacity:.5;cursor:default}
+.match-label{font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:6px;opacity:.8}
+.match-pairs{margin-top:16px}
+.pair-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,80,0,.12);border:1px solid rgba(39,174,96,.3);margin-bottom:6px;animation:fdin .3s ease}
+.pair-quote{flex:1;font-style:italic;font-size:14px;color:var(--greenl)}
+.pair-arrow{color:var(--gold);font-size:16px}
+.pair-tech{font-family:'Cinzel',serif;font-size:13px;color:var(--green);letter-spacing:1px}
+
+/* ── ROOM 3: VAULT ── */
+.vault-q{background:rgba(20,20,32,.9);border:1px solid rgba(201,168,76,.13);padding:22px 26px;margin-bottom:14px}
+.vault-q-num{font-family:'Cinzel',serif;font-size:11px;color:var(--crimson);letter-spacing:3px;margin-bottom:10px}
+.vault-q-text{font-size:18px;color:var(--bone);line-height:1.5;font-weight:600;margin-bottom:14px}
+.vault-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:480px){.vault-opts{grid-template-columns:1fr}}
+.vault-opt{background:rgba(15,15,25,.8);border:1px solid rgba(201,168,76,.1);color:var(--ghost);font-family:'Crimson Text',serif;font-size:16px;padding:12px 14px;cursor:pointer;text-align:left;transition:all .2s;display:flex;gap:10px}
+.vault-opt:hover:not(:disabled){background:rgba(139,0,0,.12);border-color:rgba(192,57,43,.4);color:var(--bone)}
+.vault-opt.correct{background:rgba(0,80,0,.18);border-color:var(--green);color:var(--greenl)}
+.vault-opt.wrong{background:rgba(139,0,0,.18);border-color:var(--crimson);color:rgba(240,230,211,.5)}
+.vault-opt:disabled{cursor:default}
+.vault-opt-ltr{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--gold);opacity:.7;flex-shrink:0}
+.digit-display{display:flex;gap:12px;justify-content:center;margin:20px 0}
+.digit-box{width:52px;height:64px;background:rgba(10,10,20,.9);border:2px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-family:'Cinzel Decorative',serif;font-size:28px;font-weight:700;transition:all .4s}
+.digit-box.revealed{border-color:var(--gold);color:var(--gold);box-shadow:0 0 16px rgba(201,168,76,.4);animation:revl .5s ease}
+.digit-box.empty-d{color:var(--mist);font-size:22px}
+@keyframes revl{0%{transform:scale(1.3);opacity:0}100%{transform:scale(1);opacity:1}}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:220px;margin:0 auto 16px}
+.kp-btn{background:rgba(20,20,32,.9);border:1px solid rgba(201,168,76,.15);color:var(--bone);font-family:'Cinzel',serif;font-size:20px;padding:14px;cursor:pointer;transition:all .2s;text-align:center}
+.kp-btn:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
+.kp-btn.del{font-size:14px;color:var(--crimson)}
+.code-entry{font-family:'Cinzel Decorative',serif;font-size:32px;letter-spacing:12px;text-align:center;color:var(--gold);margin-bottom:16px;min-height:44px;text-shadow:0 0 20px rgba(201,168,76,.4)}
+.code-entry.wrong-code{animation:shk .5s ease;color:var(--crimson)}
+.vault-progress{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--mist);text-align:center;margin-bottom:16px}
+
+/* ── ROOM 4: ODD ONE OUT ── */
+.sentences{display:flex;flex-direction:column;gap:10px}
+.sentence-card{background:rgba(20,20,32,.8);border:1px solid rgba(201,168,76,.1);padding:16px 20px;cursor:pointer;transition:all .25s;font-size:17px;line-height:1.5;display:flex;gap:14px;align-items:flex-start}
+.sentence-card:hover{border-color:rgba(192,57,43,.4);background:rgba(139,0,0,.1)}
+.sentence-card.correct{border-color:var(--green);background:rgba(0,80,0,.15);color:var(--greenl);cursor:default}
+.sentence-card.wrong{border-color:var(--crimson);background:rgba(139,0,0,.15);animation:shk .4s ease;cursor:default}
+.sentence-card.dimmed{opacity:.45;cursor:default}
+.s-num{font-family:'Cinzel',serif;font-size:13px;color:var(--gold);opacity:.6;flex-shrink:0;margin-top:2px}
+
+/* ── ROOM 5: FILL BLANKS ── */
+.passage-text{font-size:20px;line-height:2.2;color:var(--bone);font-weight:600;margin-bottom:24px;background:rgba(20,20,32,.7);border:1px solid rgba(201,168,76,.1);padding:24px 28px}
+.blank{display:inline-block;min-width:120px;border-bottom:2px solid var(--gold);padding:2px 10px;cursor:pointer;transition:all .25s;font-family:'Cinzel',serif;font-size:15px;letter-spacing:1px;text-align:center;background:rgba(201,168,76,.05);vertical-align:middle;margin:0 4px}
+.blank:hover{background:rgba(201,168,76,.12)}
+.blank.filled{color:var(--gold);background:rgba(201,168,76,.1)}
+.blank.sel-blank{border-bottom-color:var(--crimson);box-shadow:0 2px 8px rgba(192,57,43,.4)}
+.blank.correct-b{border-bottom-color:var(--green);color:var(--green);background:rgba(0,80,0,.12)}
+.blank.wrong-b{animation:shk .4s ease;border-bottom-color:var(--crimson);color:var(--crimson)}
+.word-bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.word-card{background:rgba(20,20,32,.8);border:1px solid rgba(201,168,76,.15);color:var(--ghost);font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;padding:9px 16px;cursor:pointer;transition:all .25s;text-transform:uppercase}
+.word-card:hover:not(.used){border-color:rgba(201,168,76,.5);color:var(--bone)}
+.word-card.sel-w{border-color:var(--gold);color:var(--bone);background:rgba(201,168,76,.12);box-shadow:0 0 10px rgba(201,168,76,.3)}
+.word-card.used{opacity:.25;cursor:default}
+.word-bank-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--mist);margin-bottom:10px}
+
+/* ── ESCAPED ── */
+.esc-title{font-family:'Cinzel Decorative',serif;font-size:clamp(22px,5vw,44px);font-weight:900;text-align:center;margin-bottom:8px;text-shadow:0 0 40px currentColor}
+.esc-name{font-family:'Cinzel',serif;font-size:17px;color:var(--gold);letter-spacing:3px;text-align:center;margin-bottom:20px}
+.esc-score{font-family:'Cinzel Decorative',serif;font-size:clamp(52px,12vw,80px);font-weight:900;line-height:1;text-align:center;text-shadow:0 0 40px currentColor}
+.esc-sub{font-family:'Cinzel',serif;font-size:13px;color:var(--mist);letter-spacing:3px;text-align:center;margin:6px 0 20px}
+.esc-verdict{font-style:italic;font-size:18px;line-height:1.6;color:var(--ghost);text-align:center;max-width:440px;padding:16px 20px;border-top:1px solid rgba(201,168,76,.1);border-bottom:1px solid rgba(201,168,76,.1);margin:0 auto 28px}
+.esc-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ── LEADERBOARD ── */
+.lb-title{font-family:'Cinzel Decorative',serif;font-size:clamp(16px,3.5vw,24px);color:var(--gold);text-align:center;margin-bottom:4px;text-shadow:0 0 20px rgba(201,168,76,.4)}
+.lb-sub{font-style:italic;color:var(--mist);text-align:center;margin-bottom:20px;font-size:15px}
+.lb-note{text-align:center;font-style:italic;color:var(--mist);font-size:13px;margin-bottom:20px;line-height:1.5}
+.lb-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(20,20,32,.7);border:1px solid rgba(201,168,76,.08);margin-bottom:6px;animation:fdin .4s ease both}
+.lb-row.g1{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.07)}
+.lb-row.g2{border-color:rgba(192,192,192,.2)}
+.lb-row.g3{border-color:rgba(205,127,50,.2)}
+.lb-row.me{border-color:rgba(192,57,43,.4);background:rgba(192,57,43,.06)}
+.lb-rank{font-family:'Cinzel',serif;font-size:18px;font-weight:700;width:32px;text-align:center;flex-shrink:0}
+.lb-name{font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;flex:1;color:var(--bone)}
+.lb-pts{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold)}
+.lb-detail{font-size:12px;color:var(--mist)}
+.lb-empty{text-align:center;color:var(--mist);font-style:italic;padding:28px;font-size:16px}
+
+@media(max-width:600px){
+  .room-header{padding:10px 12px}
+  .rh-name{font-size:11px}
+  .passage-text{font-size:17px;padding:16px 14px}
+  .card{padding:28px 20px}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="grid"></div>
+
+<!-- ══ TITLE ══ -->
+<div class="screen on" id="s-title">
+  <div class="tag" style="color:var(--gold)">✦ an interactive gothic experience ✦</div>
+  <div class="t-h1">Escape<br>Blackwood Manor</div>
+  <div class="t-h2">Five Rooms. One Chance.</div>
+  <div class="candles">
+    <div class="candle"><div class="flame" style="animation-delay:.3s"></div><div class="cbody" style="height:44px"></div><div class="cdrip"></div></div>
+    <div class="candle"><div class="flame" style="animation-delay:.7s;height:28px"></div><div class="cbody" style="height:66px"></div><div class="cdrip"></div></div>
+    <div class="candle"><div class="flame" style="animation-delay:.1s"></div><div class="cbody" style="height:50px"></div><div class="cdrip"></div></div>
+  </div>
+  <div class="divider"></div>
+  <p class="t-flavor">You are trapped in Blackwood Manor. Five rooms stand between you and the outside world. Each door is sealed. Each seal demands Gothic knowledge.<br><br>Solve every room to escape.</p>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+    <button class="btn btn-g" onclick="showScreen('name')">ENTER IF YOU DARE</button>
+    <button class="btn btn-o" onclick="viewLB()">HALL OF INFAMY</button>
+  </div>
+</div>
+
+<!-- ══ NAME ══ -->
+<div class="screen" id="s-name">
+  <div class="card">
+    <div class="card-title">Who Dares Enter?</div>
+    <div class="divider"></div>
+    <p class="card-sub">The manor demands your name before it claims you.</p>
+    <input class="ninput" id="ninput" placeholder="Enter your name..." maxlength="22"
+      oninput="document.getElementById('nbtn').disabled=this.value.trim().length<2"
+      onkeydown="if(event.key==='Enter'&&this.value.trim().length>=2)beginGame()">
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-o" onclick="showScreen('title')">RETREAT</button>
+      <button class="btn btn-g" id="nbtn" onclick="beginGame()" disabled>ENTER THE MANOR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ROOM ══ -->
+<div class="screen" id="s-room" style="padding:0;justify-content:flex-start;align-items:stretch">
+  <div class="room-header">
+    <div>
+      <div class="rh-room" id="rh-room">ROOM 1 OF 5</div>
+      <div class="dots" id="rh-dots"></div>
+    </div>
+    <div class="rh-name" id="rh-name">The Entrance Hall</div>
+    <div class="rh-right">
+      <div class="rh-score">SCORE<br><span id="rh-score">0</span></div>
+      <div class="timer-w">
+        <svg class="timer-svg" width="52" height="52" viewBox="0 0 52 52">
+          <circle class="t-bg" cx="26" cy="26" r="21"/>
+          <circle class="t-arc" id="t-arc" cx="26" cy="26" r="21" stroke="#c9a84c" stroke-dasharray="131.95" stroke-dashoffset="0"/>
+        </svg>
+        <div class="t-num" id="t-num" style="color:#c9a84c">120</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:center;flex:1;padding:20px 16px">
+    <div class="room-body">
+      <div id="room-story" class="room-story"></div>
+      <div id="room-main"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ESCAPED ══ -->
+<div class="screen" id="s-escaped">
+  <div style="text-align:center;max-width:500px;width:100%">
+    <div class="esc-title" id="esc-title"></div>
+    <div class="divider"></div>
+    <div class="esc-name" id="esc-name"></div>
+    <div class="esc-score" id="esc-score"></div>
+    <div class="esc-sub" id="esc-sub"></div>
+    <div class="esc-verdict" id="esc-verdict"></div>
+    <div class="esc-btns">
+      <button class="btn btn-o" onclick="beginGame()">PLAY AGAIN</button>
+      <button class="btn btn-g" onclick="viewLB()">HALL OF INFAMY</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LEADERBOARD ══ -->
+<div class="screen" id="s-lb">
+  <div style="max-width:600px;width:100%">
+    <div class="lb-title">⚰ Hall of Infamy ⚰</div>
+    <div class="lb-sub">Those who survived the manor's trials</div>
+    <div class="divider"></div>
+    <p class="lb-note">Scores saved on this device. Compare with classmates!</p>
+    <div id="lb-list"></div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+      <button class="btn btn-o" onclick="showScreen('title')">RETURN</button>
+      <button class="btn btn-g" onclick="beginGame()">PLAY AGAIN</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CIRC = 2*Math.PI*21; // 131.95
+const ROOM_TIME = 120;
+
+// ── ROOM DATA ──
+
+const R1 = {
+  name:"The Entrance Hall",
+  story:"You stumble into the manor's entrance hall. Dust and cobwebs fill the air. The door ahead is sealed — but the manor will open it only if you can prove you understand what makes a story truly Gothic. <strong>Sort each item below into the correct category. Select an item, then click a bin to place it. Wrong placements cost you 25 points.</strong>",
+  items:[
+    {id:0,text:"A lone figure on fog-drenched moors at midnight",bin:"g"},
+    {id:1,text:"A crumbling castle concealing dark family secrets",bin:"g"},
+    {id:2,text:"A scientist pursuing dangerously forbidden knowledge",bin:"g"},
+    {id:3,text:"A supernatural presence that cannot be explained",bin:"g"},
+    {id:4,text:"Ancient ruins consumed by ivy and deep shadow",bin:"g"},
+    {id:5,text:"A cheerful birthday party in a sunlit garden",bin:"n"},
+    {id:6,text:"Scrolling through social media on a smartphone",bin:"n"},
+    {id:7,text:"A PE lesson on a bright school sports field",bin:"n"},
+  ]
+};
+
+const R2 = {
+  name:"The Library",
+  story:"The library is filled with ancient texts and guttering candles. Scattered across the desk are four quotes from Gothic literature — but they have been separated from their technique labels. <strong>Match each quote to the Gothic technique it uses. Click a quote card to select it, then click the matching technique.</strong>",
+  quotes:[
+    {id:0,text:'"The storm raged as violently as his tortured soul."',tech:0},
+    {id:1,text:'"I dare not open that door. Something terrible waits beyond."',tech:1},
+    {id:2,text:'"The creature stared back — my face, and yet not my face."',tech:2},
+    {id:3,text:'"The castle had stood for centuries, rotting from within."',tech:3},
+  ],
+  techniques:[
+    {id:0,name:"Pathetic Fallacy"},
+    {id:1,name:"Foreshadowing"},
+    {id:2,name:"The Doppelgänger"},
+    {id:3,name:"Gothic Decay"},
+  ]
+};
+
+const R3 = {
+  name:"The Vault",
+  story:"Deep in the cellars lies a vault. Its four-digit combination is hidden within four questions. <strong>The letter of your correct answer (A=1, B=2, C=3, D=4) reveals each digit. Answer all four, then enter the code on the keypad to unlock the vault.</strong>",
+  code:"2413",
+  qs:[
+    {text:'A "doppelgänger" in Gothic fiction is...',opts:['A ghost that haunts a castle','A dark double or sinister twin of the main character','A forbidden underground chamber','A supernatural creature that cannot die'],correct:1},
+    {text:'Frankenstein was written by...',opts:['Bram Stoker','Edgar Allan Poe','Jane Austen','Mary Shelley'],correct:3},
+    {text:'"Pathetic fallacy" means...',opts:['When nature or weather mirrors the mood of the scene','A villain who is pathetically weak','A story with a tragic ending','A false clue that misleads the reader'],correct:0},
+    {text:'Which of these is a famous Gothic novel?',opts:['Pride and Prejudice','Oliver Twist','Dracula','The Hobbit'],correct:2},
+  ]
+  // digits: Q1 correct=B(2), Q2 correct=D(4), Q3 correct=A(1), Q4 correct=C(3) → 2413
+};
+
+const R4 = {
+  name:"The Portrait Gallery",
+  story:"The portrait gallery stretches ahead, its painted eyes seeming to follow your every step. On a lectern lies a description of the manor — but one of its five sentences is an impostor. It doesn't belong in a Gothic story. <strong>Read carefully. Click the sentence that does NOT belong in Gothic fiction.</strong>",
+  sentences:[
+    "A blanket of fog smothered the ancient churchyard at midnight.",
+    "Strange shadows moved between the crumbling gravestones.",
+    "The children played cheerfully, laughing under the bright summer sunshine.",
+    "A figure dressed entirely in black watched from the tower window above.",
+    "Something unspeakable had occurred within these walls long ago."
+  ],
+  odd:2
+};
+
+const R5 = {
+  name:"The Study — Final Room",
+  story:"You reach the study. On the desk lies a passage describing the manor — but five crucial words have been removed. <strong>Click a word from the word bank below, then click the correct gap in the passage to place it. Click a filled gap to return the word. When all gaps are filled, click 'Attempt Escape!'</strong>",
+  blanks:['CASTLE','MOORS','MIST','FOREBODING','GARGOYLE'],
+  words:['CASTLE','MOORS','MIST','FOREBODING','GARGOYLE','BUNGALOW','SUNSHINE','EXCITEMENT','MOTORWAY','GNOME']
+};
+
+// ── STATE ──
+let G = {
+  name:'',room:0,score:0,timeLeft:ROOM_TIME,mistakes:0,
+  timer:null,lastEntry:null,
+  r1:{sel:null,placed:{}},
+  r2:{selQ:null,pairs:{}},
+  r3:{ans:[null,null,null,null],curQ:0,stage:'qs',code:''},
+  r4:{picked:null},
+  r5:{blanks:[null,null,null,null,null],selWord:null}
+};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('s-'+id).classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function beginGame(){
+  const inp=document.getElementById('ninput');
+  const n=inp?inp.value.trim():G.name;
+  if(n.length<2){showScreen('name');return}
+  G.name=n;
+  G.room=0; G.score=0; G.mistakes=0;
+  G.r1={sel:null,placed:{}};
+  G.r2={selQ:null,pairs:{}};
+  G.r3={ans:[null,null,null,null],curQ:0,stage:'qs',code:''};
+  G.r4={picked:null};
+  G.r5={blanks:[null,null,null,null,null],selWord:null};
+  loadRoom(0);
+}
+
+// ── TIMER ──
+const ROOMS_DATA=[R1,R2,R3,R4,R5];
+const ROOM_NAMES=["The Entrance Hall","The Library","The Vault","The Portrait Gallery","The Study"];
+
+function loadRoom(idx){
+  G.room=idx; G.timeLeft=ROOM_TIME; G.mistakes=0;
+  clearInterval(G.timer);
+  showScreen('room');
+  updateHeader();
+  document.getElementById('room-story').innerHTML=`<strong>📍 ${ROOMS_DATA[idx].name}</strong>${ROOMS_DATA[idx].story}`;
+  renderRoom(idx);
+  G.timer=setInterval(tick,1000);
+}
+
+function tick(){
+  G.timeLeft--;
+  updateTimerUI();
+  if(G.timeLeft<=0){clearInterval(G.timer);G.timeLeft=0;}
+}
+
+function updateTimerUI(){
+  const t=G.timeLeft, color=t>40?'#c9a84c':t>15?'#e67e22':'#c0392b';
+  const arc=document.getElementById('t-arc'), num=document.getElementById('t-num');
+  if(arc){arc.style.strokeDashoffset=CIRC*(1-(t/ROOM_TIME));arc.style.stroke=color}
+  if(num){num.textContent=t;num.style.color=color}
+}
+
+function updateHeader(){
+  document.getElementById('rh-room').textContent=`ROOM ${G.room+1} OF 5`;
+  document.getElementById('rh-name').textContent=ROOM_NAMES[G.room];
+  document.getElementById('rh-score').textContent=G.score.toLocaleString();
+  const dots=document.getElementById('rh-dots');
+  dots.innerHTML=Array.from({length:5},(_,i)=>`<div class="dot ${i<G.room?'done':i===G.room?'active':''}"></div>`).join('');
+}
+
+function addScore(pts){
+  G.score=Math.max(0,G.score+pts);
+  document.getElementById('rh-score').textContent=G.score.toLocaleString();
+}
+
+function roomComplete(){
+  clearInterval(G.timer);
+  const timeBonus=Math.round((G.timeLeft/ROOM_TIME)*350);
+  const mistakePenalty=G.mistakes*25;
+  const roomScore=350+timeBonus-mistakePenalty;
+  addScore(Math.max(50,roomScore));
+  if(G.room===4){setTimeout(finishGame,900);}
+  else{setTimeout(()=>loadRoom(G.room+1),900);}
+}
+
+function setFeedback(html,type='info'){
+  let el=document.getElementById('fb');
+  if(!el){const d=document.createElement('div');d.id='fb';document.getElementById('room-main').appendChild(d);el=d}
+  el.className=`fb ${type}`;el.innerHTML=html;
+}
+
+// ── RENDER DISPATCH ──
+function renderRoom(i){
+  const fns=[renderR1,renderR2,renderR3,renderR4,renderR5];
+  document.getElementById('room-main').innerHTML='';
+  fns[i]();
+}
+
+// ══ ROOM 1: SORT ══
+function renderR1(){
+  const placed=G.r1.placed;
+  const gItems=R1.items.filter(i=>placed[i.id]==='g');
+  const nItems=R1.items.filter(i=>placed[i.id]==='n');
+  const pool=R1.items.filter(i=>!placed[i.id]);
+  const done=Object.keys(placed).length;
+  const m=document.getElementById('room-main');
+  m.innerHTML=`
+    <div class="sort-count">SORTED: ${done} / ${R1.items.length} — Select an item, then click a bin</div>
+    <div class="sort-pool" id="sort-pool">
+      ${pool.map(it=>`<div class="sort-item${G.r1.sel===it.id?' sel':''}" id="si-${it.id}" onclick="r1Select(${it.id})">${it.text}</div>`).join('')}
+    </div>
+    <div class="bins">
+      <div class="bin${G.r1.sel!==null?' target':''}" onclick="r1Drop('g')">
+        <div class="bin-title" style="color:var(--gold)">⚰ GOTHIC CONVENTION</div>
+        <div class="bin-items">${gItems.map(i=>`<div class="bin-chip">${i.text}</div>`).join('')}</div>
+      </div>
+      <div class="bin${G.r1.sel!==null?' target':''}" onclick="r1Drop('n')">
+        <div class="bin-title" style="color:var(--crimson)">☀ NOT GOTHIC</div>
+        <div class="bin-items">${nItems.map(i=>`<div class="bin-chip ng">${i.text}</div>`).join('')}</div>
+      </div>
+    </div>
+    <div id="fb"></div>`;
+}
+function r1Select(id){G.r1.sel=G.r1.sel===id?null:id;renderR1();}
+function r1Drop(bin){
+  if(G.r1.sel===null)return;
+  const item=R1.items.find(i=>i.id===G.r1.sel);
+  if(!item)return;
+  if(item.bin===bin){
+    G.r1.placed[item.id]=bin;
+    G.r1.sel=null;
+    renderR1();
+    if(Object.keys(G.r1.placed).length===R1.items.length){
+      setFeedback('✓ All items correctly sorted! The door ahead groans open...','ok');
+      setTimeout(roomComplete,1200);
+    } else setFeedback('✓ Correct!','ok');
+  } else {
+    G.mistakes++;addScore(-25);
+    setFeedback('✗ That doesn\'t belong there. Try again. (-25 points)','bad');
+    const el=document.getElementById(`si-${G.r1.sel}`);
+    if(el){el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),500);}
+    G.r1.sel=null;renderR1();
+  }
+}
+
+// ══ ROOM 2: MATCH ══
+function renderR2(){
+  const paired=Object.keys(G.r2.pairs);
+  const pairedQIds=paired.map(Number);
+  const m=document.getElementById('room-main');
+  m.innerHTML=`
+    <div class="match-grid">
+      <div>
+        <div class="match-col-title">📜 Quotes</div>
+        ${R2.quotes.map(q=>{
+          const isPaired=pairedQIds.includes(q.id);
+          const isSel=G.r2.selQ===q.id;
+          return `<div class="match-card${isPaired?' matched':isSel?' sel':''}" id="mq-${q.id}" onclick="r2SelQ(${q.id})">
+            <div class="match-label">QUOTE ${String.fromCharCode(65+q.id)}</div>
+            <em>${q.text}</em>
+          </div>`;
+        }).join('')}
+      </div>
+      <div>
+        <div class="match-col-title">🔍 Techniques</div>
+        ${R2.techniques.map(t=>{
+          const matchedQ=R2.quotes.find(q=>G.r2.pairs[q.id]===t.id);
+          const isPaired=!!matchedQ;
+          return `<div class="match-card${isPaired?' matched disabled':''}" id="mt-${t.id}" onclick="r2SelT(${t.id})">
+            <div class="match-label">TECHNIQUE</div>
+            ${t.name}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    ${paired.length>0?`<div class="match-pairs"><div class="match-col-title" style="margin-top:16px">MATCHED PAIRS ✓</div>${R2.quotes.filter(q=>G.r2.pairs[q.id]!==undefined).map(q=>`<div class="pair-row"><div class="pair-quote">${q.text}</div><div class="pair-arrow">→</div><div class="pair-tech">${R2.techniques.find(t=>t.id===G.r2.pairs[q.id]).name}</div></div>`).join('')}</div>`:''}
+    <div id="fb"></div>`;
+}
+function r2SelQ(id){
+  const paired=Object.keys(G.r2.pairs).map(Number);
+  if(paired.includes(id))return;
+  G.r2.selQ=G.r2.selQ===id?null:id;
+  renderR2();
+}
+function r2SelT(tid){
+  if(G.r2.selQ===null)return;
+  const q=R2.quotes.find(q=>q.id===G.r2.selQ);
+  if(q.tech===tid){
+    G.r2.pairs[q.id]=tid; G.r2.selQ=null;
+    renderR2();
+    if(Object.keys(G.r2.pairs).length===4){
+      setFeedback('✓ All quotes matched! The bookshelf swings open to reveal a hidden passage...','ok');
+      setTimeout(roomComplete,1200);
+    } else setFeedback('✓ Correct match!','ok');
+  } else {
+    G.mistakes++;addScore(-25);
+    setFeedback('✗ That technique doesn\'t match that quote. Look more carefully. (-25 points)','bad');
+    const qEl=document.getElementById(`mq-${G.r2.selQ}`),tEl=document.getElementById(`mt-${tid}`);
+    if(qEl){qEl.classList.add('wrong');setTimeout(()=>qEl.classList.remove('wrong'),500);}
+    if(tEl){tEl.classList.add('wrong');setTimeout(()=>tEl.classList.remove('wrong'),500);}
+    G.r2.selQ=null;renderR2();
+  }
+}
+
+// ══ ROOM 3: VAULT ══
+function renderR3(){
+  const m=document.getElementById('room-main');
+  if(G.r3.stage==='qs'){
+    const q=R3.qs[G.r3.curQ], letters=['A','B','C','D'];
+    m.innerHTML=`
+      <div class="digit-display">
+        ${R3.qs.map((_,i)=>{
+          const a=G.r3.ans[i];
+          const digit=a!==null?(a+1).toString():null;
+          return `<div class="digit-box${digit?' revealed':''}"><span>${digit||'?'}</span></div>`;
+        }).join('')}
+      </div>
+      <div class="vault-progress">QUESTION ${G.r3.curQ+1} OF 4 — Answer to reveal digit ${G.r3.curQ+1}</div>
+      <div class="vault-q">
+        <div class="vault-q-num">QUESTION ${G.r3.curQ+1} — (A=1, B=2, C=3, D=4)</div>
+        <div class="vault-q-text">${q.text}</div>
+        <div class="vault-opts">
+          ${q.opts.map((o,i)=>`<button class="vault-opt" onclick="r3Answer(${i})"><span class="vault-opt-ltr">${letters[i]}</span>${o}</button>`).join('')}
+        </div>
+      </div>
+      <div id="fb"></div>`;
+  } else {
+    m.innerHTML=`
+      <div style="text-align:center;margin-bottom:16px;font-family:'Cinzel',serif;font-size:13px;color:var(--gold);letter-spacing:3px">ALL DIGITS REVEALED — ENTER THE CODE</div>
+      <div class="digit-display">
+        ${R3.qs.map((_,i)=>`<div class="digit-box revealed"><span>${G.r3.ans[i]+1}</span></div>`).join('')}
+      </div>
+      <div class="code-entry" id="code-display">${G.r3.code.padEnd(4,'_').split('').join(' ')}</div>
+      <div class="keypad">
+        ${[1,2,3,4,5,6,7,8,9,'←',0,'✓'].map(k=>`<button class="kp-btn${k==='←'?' del':''}" onclick="r3Key('${k}')">${k}</button>`).join('')}
+      </div>
+      <div style="text-align:center"><button class="btn btn-g" onclick="r3Unlock()" style="font-size:12px;padding:14px 36px">UNLOCK THE VAULT</button></div>
+      <div id="fb"></div>`;
+  }
+}
+function r3Answer(idx){
+  const q=R3.qs[G.r3.curQ],letters=['A','B','C','D'];
+  if(idx===q.correct){
+    G.r3.ans[G.r3.curQ]=idx;
+    const next=G.r3.curQ+1;
+    if(next>=4){G.r3.stage='kp';G.r3.code='';renderR3();}
+    else{G.r3.curQ=next;renderR3();setFeedback(`✓ Correct! Digit ${G.r3.curQ} revealed. (${letters[idx]} = ${idx+1})`,'ok');}
+  } else {
+    G.mistakes++;addScore(-25);
+    const opts=document.querySelectorAll('.vault-opt');
+    if(opts[idx])opts[idx].classList.add('wrong');
+    if(opts[q.correct])opts[q.correct].classList.add('correct');
+    opts.forEach(o=>o.disabled=true);
+    setFeedback(`✗ Wrong answer. The correct answer was ${letters[q.correct]}. (-25 points)`,'bad');
+    G.r3.ans[G.r3.curQ]=q.correct;
+    setTimeout(()=>{
+      const next=G.r3.curQ+1;
+      if(next>=4){G.r3.stage='kp';G.r3.code='';renderR3();}
+      else{G.r3.curQ=next;renderR3();}
+    },1400);
+  }
+}
+function r3Key(k){
+  if(k==='←'){G.r3.code=G.r3.code.slice(0,-1);}
+  else if(k==='✓'){r3Unlock();return;}
+  else if(G.r3.code.length<4){G.r3.code+=k;}
+  const disp=document.getElementById('code-display');
+  if(disp)disp.textContent=G.r3.code.padEnd(4,'_').split('').join(' ');
+}
+function r3Unlock(){
+  if(G.r3.code===R3.code){
+    setFeedback('✓ CODE ACCEPTED. The vault grinds open...','ok');
+    setTimeout(roomComplete,1000);
+  } else {
+    G.mistakes++;addScore(-25);
+    const disp=document.getElementById('code-display');
+    if(disp){disp.classList.add('wrong-code');setTimeout(()=>disp.classList.remove('wrong-code'),600);}
+    G.r3.code='';
+    if(disp)setTimeout(()=>{if(disp)disp.textContent='_ _ _ _'},150);
+    setFeedback(`✗ Wrong code. Go back and recalculate. Remember: A=1, B=2, C=3, D=4. (-25 points)`,'bad');
+  }
+}
+
+// ══ ROOM 4: ODD ONE OUT ══
+function renderR4(){
+  const m=document.getElementById('room-main');
+  m.innerHTML=`
+    <div class="sentences">
+      ${R4.sentences.map((s,i)=>`
+        <div class="sentence-card" id="sc-${i}" onclick="r4Pick(${i})">
+          <span class="s-num">${i+1}.</span>
+          <span>${s}</span>
+        </div>`).join('')}
+    </div>
+    <div id="fb"></div>`;
+}
+function r4Pick(i){
+  if(G.r4.picked!==null)return;
+  G.r4.picked=i;
+  if(i===R4.odd){
+    document.getElementById(`sc-${i}`).className='sentence-card correct';
+    R4.sentences.forEach((_,j)=>{if(j!==i)document.getElementById(`sc-${j}`).className='sentence-card dimmed';});
+    setFeedback('✓ Correct! That sentence has no place in a Gothic story. The portrait on the wall slides aside...','ok');
+    setTimeout(roomComplete,1400);
+  } else {
+    document.getElementById(`sc-${i}`).className='sentence-card wrong';
+    G.mistakes++;addScore(-25);
+    setTimeout(()=>{
+      document.getElementById(`sc-${i}`).className='sentence-card';
+      G.r4.picked=null;
+      setFeedback('✗ That sentence could belong in a Gothic story. Look more carefully. (-25 points)','bad');
+    },800);
+  }
+}
+
+// ══ ROOM 5: FILL BLANKS ══
+function renderR5(){
+  const passageParts=[
+    "The ancient "," stood alone upon the ",", its towers lost in ",". The traveller felt a terrible sense of "," as he approached. Above the doorway, a carved "," seemed to watch his every step."
+  ];
+  const m=document.getElementById('room-main');
+  let passageHTML=passageParts[0];
+  for(let i=0;i<5;i++){
+    const val=G.r5.blanks[i];
+    const isSel=false;
+    passageHTML+=`<span class="blank${val?' filled':''}${G.r5.selWord&&!val?' sel-blank':''}" id="bl-${i}" onclick="r5PlaceWord(${i})">${val||'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}</span>`;
+    passageHTML+=passageParts[i+1];
+  }
+  const words=R5.words.map(w=>{
+    const isUsed=G.r5.blanks.includes(w);
+    return `<div class="word-card${isUsed?' used':w===G.r5.selWord?' sel-w':''}" onclick="r5SelWord('${w}')">${w}</div>`;
+  }).join('');
+  const allFilled=G.r5.blanks.every(b=>b!==null);
+  m.innerHTML=`
+    <div class="word-bank-label">WORD BANK — Click a word, then click a gap to fill it. Click a filled gap to remove it.</div>
+    <div class="word-bank">${words}</div>
+    <div class="passage-text">${passageHTML}</div>
+    ${allFilled?`<div style="text-align:center;margin-top:8px"><button class="btn btn-g" onclick="r5Check()">ATTEMPT ESCAPE!</button></div>`:''}
+    <div id="fb"></div>`;
+}
+function r5SelWord(w){
+  if(G.r5.blanks.includes(w))return;
+  G.r5.selWord=G.r5.selWord===w?null:w;
+  renderR5();
+}
+function r5PlaceWord(idx){
+  if(G.r5.blanks[idx]!==null){
+    G.r5.selWord=null;
+    G.r5.blanks[idx]=null;
+    renderR5();return;
+  }
+  if(!G.r5.selWord)return;
+  G.r5.blanks[idx]=G.r5.selWord;
+  G.r5.selWord=null;
+  renderR5();
+}
+function r5Check(){
+  let allCorrect=true;
+  for(let i=0;i<5;i++){
+    const el=document.getElementById(`bl-${i}`);
+    if(G.r5.blanks[i]===R5.blanks[i]){
+      if(el)el.classList.add('correct-b');
+    } else {
+      allCorrect=false;G.mistakes++;
+      if(el){el.classList.add('wrong-b');setTimeout(()=>{el.classList.remove('wrong-b')},600);}
+      setTimeout(()=>{G.r5.blanks[i]=null;renderR5();},700);
+    }
+  }
+  if(allCorrect){
+    addScore(-25); // small adjustment for being able to check
+    setFeedback('✓ All correct! The front door crashes open. You are FREE!','ok');
+    setTimeout(roomComplete,1400);
+  } else {
+    addScore(-25*G.mistakes);
+    setFeedback(`✗ Some words are wrong — they've been returned to the bank. Check your Gothic vocabulary. (-${25} pts per error)`,'bad');
+  }
+}
+
+// ── FINISH ──
+function finishGame(){
+  clearInterval(G.timer);
+  const entry={name:G.name,score:G.score,mistakes:G.mistakes,ts:Date.now()};
+  G.lastEntry=entry;
+  saveLB(entry);
+  const sc=G.score;
+  let title,color,verdict;
+  if(sc>=3000){title='YOU ESCAPED!';color='#c9a84c';verdict='Masterful. You moved through Blackwood Manor with authority. The Gothic holds no secrets from you.';}
+  else if(sc>=2200){title='YOU ESCAPED!';color='#c9a84c';verdict='Impressive. The manor yielded to your knowledge. A few stumbles, but you made it out.';}
+  else if(sc>=1400){title='YOU ESCAPED!';color='#a8d8a8';verdict='You escaped — but not easily. The manor left its mark on you. Study harder before you return.';}
+  else{title='YOU ESCAPED...';color='#e8c87a';verdict='Barely. The manor drained you. Your Gothic knowledge needs work before you dare return.';}
+  const lb=getLB();
+  const rank=lb.findIndex(e=>e.ts===entry.ts)+1;
+  document.getElementById('esc-title').textContent=title;
+  document.getElementById('esc-title').style.color=color;
+  document.getElementById('esc-score').textContent=sc.toLocaleString();
+  document.getElementById('esc-score').style.color=color;
+  document.getElementById('esc-score').style.textShadow=`0 0 40px ${color}`;
+  document.getElementById('esc-name').textContent=G.name.toUpperCase();
+  document.getElementById('esc-sub').textContent=`${G.mistakes} MISTAKE${G.mistakes!==1?'S':''} MADE`;
+  document.getElementById('esc-verdict').textContent=verdict;
+  showScreen('escaped');
+}
+
+// ── LEADERBOARD ──
+function getLB(){try{return JSON.parse(localStorage.getItem('bwm_lb')||'[]')}catch{return[]}}
+function saveLB(e){try{const lb=getLB();lb.push(e);lb.sort((a,b)=>b.score-a.score);localStorage.setItem('bwm_lb',JSON.stringify(lb.slice(0,25)));}catch{}}
+function viewLB(){
+  const lb=getLB();
+  const sym=['👑','🥈','🥉'];
+  const rc=['g1','g2','g3'];
+  document.getElementById('lb-list').innerHTML=lb.length===0
+    ?'<div class="lb-empty">No souls have yet escaped the manor.</div>'
+    :lb.slice(0,15).map((e,i)=>{
+      const isMe=G.lastEntry&&e.ts===G.lastEntry.ts;
+      const cls=`lb-row ${i<3?rc[i]:''} ${isMe?'me':''}`;
+      return `<div class="${cls}" style="animation-delay:${i*.06}s">
+        <div class="lb-rank" style="color:${i===0?'#c9a84c':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--mist)'}">${i<3?sym[i]:(i+1)+'.'}
+        </div>
+        <div class="lb-name">${esc(e.name)}${isMe?' ← YOU':''}</div>
+        <div style="text-align:right">
+          <div class="lb-pts">${e.score.toLocaleString()}</div>
+          <div class="lb-detail">${e.mistakes} mistake${e.mistakes!==1?'s':''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  showScreen('lb');
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+window.addEventListener('load',()=>{const n=document.getElementById('ninput');if(n)n.focus()});
+</script>
+</body>
+</html>
